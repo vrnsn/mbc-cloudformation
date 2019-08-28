@@ -1,0 +1,79 @@
+Description: "Basic Initial Member template"
+Parameters:
+  MemberName:
+    Type: String
+  MemberDescription:
+    Type: String
+  MemberAdminUsername:
+    Type: String
+  MemberAdminPassword:
+    Type: String
+  NetworkName:
+    Type: String
+  NetworkDescription:
+    Type: String
+  Edition:
+    Type: String
+    AllowedValues:
+      - "STANDARD"
+      - "STARTER"
+    Default: "STARTER"
+  ThresholdPercentage:
+    Type: Number
+    Default: 50
+  ThresholdComparator:
+    Type: String
+    AllowedValues:
+      - "GREATER_THAN"
+      - "GREATER_THAN_OR_EQUAL_TO"
+    Default: "GREATER_THAN_OR_EQUAL_TO"
+  ProposalDurationInHours:
+    Type: Number
+    Default: 24
+
+Resources:
+  Member:
+    Type: "AWS::ManagedBlockchain::Member"
+    Properties:
+      NetworkConfiguration:
+        Name: !Ref NetworkName
+        Description: !Ref NetworkDescription
+        Framework: "HYPERLEDGER_FABRIC"
+        FrameworkVersion: "1.2"
+        NetworkFrameworkConfiguration:
+          NetworkFabricConfiguration:
+            Edition: !Ref Edition
+        VotingPolicy:
+          ApprovalThresholdPolicy:
+            ThresholdPercentage: !Ref ThresholdPercentage
+            ProposalDurationInHours: !Ref ProposalDurationInHours
+            ThresholdComparator: !Ref ThresholdComparator
+      MemberConfiguration:
+        Name: !Ref MemberName
+        Description: !Ref MemberDescription
+        MemberFrameworkConfiguration:
+          MemberFabricConfiguration:
+            AdminUsername: !Ref MemberAdminUsername
+            AdminPassword: !Ref MemberAdminPassword
+
+Outputs:
+  MemberId:
+    Description: member id 
+    Value: !GetAtt Member.MemberId
+    Export:
+      Name: !Sub "${AWS::StackName}-MemberId"
+  MemberName:
+    Description: network id 
+    Value: !Ref MemberName
+    Export:
+      Name: !Sub "${AWS::StackName}-MemberName"
+  NetworkId:
+    Description: network id 
+    Value: !GetAtt Member.NetworkId
+    Export:
+      Name: !Sub "${AWS::StackName}-NetworkId"
+  NetworkName:
+    Description: network id 
+    Value: !Ref NetworkName
+    Export:
+      Name: !Sub "${AWS::StackName}-NetworkName"

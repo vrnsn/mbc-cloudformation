@@ -1,0 +1,37 @@
+Description: "Basic Node template where the stack imports network ID and member ID from another template where network and first member were created"
+Parameters:
+  NetworkStackName:
+    Type: String
+    Description: Stack name you used to create network and member. Import function within node properties will refer to this stack name. 
+  InstanceType:
+    Type: String
+    AllowedValues:
+      - bc.t3.small
+      - bc.t3.medium
+      - bc.t3.large
+  AvailabilityZone:
+    Type: String
+    AllowedValues:
+      - "us-east-1a"
+      - "us-east-1b"
+    Default: "us-east-1a"
+
+Resources:
+  InitialNode:
+    Type: "AWS::ManagedBlockchain::Node"
+    Properties:
+      NetworkId: 
+        Fn::ImportValue: !Sub "${NetworkStackName}-NetworkId"
+      MemberId:
+        Fn::ImportValue: !Sub "${NetworkStackName}-MemberId"
+      NodeConfiguration:
+        InstanceType: !Ref InstanceType
+        AvailabilityZone: !Ref AvailabilityZone
+
+Outputs:
+  NodeId:
+    Description: node id 
+    Value: !GetAtt InitialNode.NodeId
+    Export:
+      Name: !Sub "${AWS::StackName}-NodeId"
+        
